@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1 style="text-align:center; color:#3e2723;">MVP Submission Game</h1>
+<h2 id="game-timer" style="text-align:center; color:#3e2723;">Time Left: 240s</h2>
+
+<div class="mvp-form">
+    <form method="POST" id="mvp-form">
+        {{ form.hidden_tag() }}
+        {{ form.name.label }}
+        {{ form.name(size=32) }}
+        <button type="submit" class="submit-btn">Submit</button>
+    </form>
+
+    <form action="{{ url_for('reset') }}" method="GET">
+        <button type="submit" class="reset-btn">Reset Game</button>
+    </form>
+</div>
+
+<table class="mvp-table" id="mvp-table">
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Player</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, player, raw_player in display_data %}
+        <tr>
+            <td>{{ year }}</td>
+            <td class="{% if player and raw_player.lower() == last_guess %}guess-highlight{% endif %}">{{ player }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<style>
+    body { background-color: #f9f6f1; }
+    .mvp-form { max-width: 400px; margin: 2rem auto; padding: 1.5rem; background: #fff8f0; border: 2px solid #b48450; border-radius: 12px; text-align: center; }
+    .mvp-form input { width: 100%; padding: 0.75rem; border: 1px solid #b48450; border-radius: 8px; }
+
+    .submit-btn { width: 100%; padding: 0.75rem; background: #4caf50; color: white; border: none; border-radius: 8px; margin-top: 0.5rem; cursor: pointer; }
+    .submit-btn:hover { background: #388e3c; }
+
+    .reset-btn { width: 100%; padding: 0.75rem; background: #e53935; color: white; border: none; border-radius: 8px; margin-top: 0.5rem; cursor: pointer; }
+    .reset-btn:hover { background: #b71c1c; }
+
+    .mvp-table { width: 70%; margin: 2rem auto; border-collapse: collapse; background: #fffdf9; border: 2px solid #b48450; }
+    .mvp-table th, .mvp-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+    .mvp-table th { background: #ffecb3; }
+    .mvp-table tr:nth-child(even) { background: #f5f2ed; }
+
+    td.guess-highlight { background-color: #a5d6a7 !important; transition: background-color 1s ease; }
+
+    .flash-red td { background-color: #ffcccc !important; transition: background-color 1s ease; }
+    .flash-green td { background-color: #c8e6c9 !important; transition: background-color 1s ease; }
+</style>
+
+<script>
+    const totalSeconds = 240;
+    let timerInterval;
+    let timerStarted = false;
+
+    function updateTimerDisplay(secondsLeft) {
+        document.getElementById("game-timer").textContent = `Time Left: ${secondsLeft}s`;
+    }
+
+    function startTimer() {
+        let secondsLeft = parseInt(localStorage.getItem("timerSeconds") || totalSeconds);
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsLeft--;
+            localStorage.setItem("timerSeconds", secondsLeft);
+            updateTimerDisplay(secondsLeft);
+
+            if (secondsLeft <= 0) {
+                clearInterval(timerInterval);
+                localStorage.removeItem("timerSeconds");
+
+                const correctCount = {{ guesses|length }};
+                const totalPossible = {{ MVP_LIST|length }};
+                const percentCorrect = Math.round((correctCount / totalPossible) * 100);
+
+                alert(`Time's up! You got ${percentCorrect}% correct!`);
+                window.location.href = "{{ url_for('reset') }}";
+            }
+        }, 1000);
+    }
+
+    window.addEventListener("load", () => {
+        const savedSeconds = parseInt(localStorage.getItem("timerSeconds"));
+        if (!isNaN(savedSeconds) && savedSeconds > 0) {
+            updateTimerDisplay(savedSeconds);
+            timerStarted = true;
+            startTimer();
+        } else {
+            updateTimerDisplay(totalSeconds);
+        }
+    });
+
+    document.querySelector('.reset-btn').addEventListener('click', () => {
+        localStorage.removeItem("timerSeconds");
+        clearInterval(timerInterval);
+    });
+
+    document.getElementById("mvp-form").addEventListener("submit", (e) => {
+        if (!timerStarted) {
+            localStorage.setItem("timerSeconds", totalSeconds);
+            updateTimerDisplay(totalSeconds);
+            startTimer();
+            timerStarted = true;
+        }
+
+        const nameInput = e.target.querySelector('input[type="text"]');
+        const guess = nameInput.value.trim().toLowerCase();
+        const correctNames = {{ guesses|tojson|safe }};
+        const validNames = {{ MVP_LIST|tojson|safe }};
+
+        const table = document.getElementById("mvp-table");
+        if (validNames.map(n => n.toLowerCase()).includes(guess)) {
+            if (!correctNames.includes(guess)) {
+                table.classList.add('flash-green');
+                setTimeout(() => table.classList.remove('flash-green'), 1000);
+            }
+        } else {
+            table.classList.add('flash-red');
+            setTimeout(() => table.classList.remove('flash-red'), 1000);
+        }
+    });
+</script>
+
+{% endblock %}
+

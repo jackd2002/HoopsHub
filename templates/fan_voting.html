@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="voting-container">
+    <h1>🏀 Fan Voting 🗳️</h1>
+    <form method="POST" class="voting-form">
+        {{ form.hidden_tag() }}
+
+        <div class="vote-cell">
+            <label>{{ form.name.label }}</label>
+            {{ form.name(class="vote-input") }}
+        </div>
+
+        <div class="vote-cell">
+            <label>{{ form.mvp.label }}</label>
+            {{ form.mvp(class="vote-input") }}
+        </div>
+
+        <div class="vote-cell">
+            <label>{{ form.coy.label }}</label>
+            {{ form.coy(class="vote-input") }}
+        </div>
+
+        <div class="vote-cell">
+            <label>{{ form.roy.label }}</label>
+            {{ form.roy(class="vote-input") }}
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Vote</button>
+    </form>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(to bottom, #1e1e1e, #2c2c2c);
+        font-family: 'Segoe UI', sans-serif;
+        color: #ffffff;
+    }
+
+    .voting-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #292929;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .voting-container h1 {
+        text-align: center;
+        color: #ff6f00;
+        margin-bottom: 2rem;
+    }
+
+    .voting-form .vote-cell {
+        margin-bottom: 1.5rem;
+    }
+
+    .voting-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #ffb74d;
+    }
+
+    .vote-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #b48450;
+        border-radius: 8px;
+        font-size: 1rem;
+        background-color: #1c1c1c;
+        color: #ffffff;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #43a047;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #2e7d32;
+    }
+
+    .flash-message {
+        text-align: center;
+        color: #76ff03;
+        margin-bottom: 1rem;
+    }
+</style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% endblock %}

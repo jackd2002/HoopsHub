@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="news-header">
+    <h1>NBA News Hub</h1>
+    <span class="source-badge">via ESPN</span>
+</div>
+
+<div class="news-container">
+    {% for item in news_items %}
+        <div class="news-card">
+            {% if item.image %}
+                <img src="{{ item.image }}" alt="News Image" class="news-image">
+            {% endif %}
+            <h2><a href="{{ item.link }}" target="_blank">{{ item.headline }}</a></h2>
+            <p>{{ item.description }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(to bottom, #1e1e1e, #2e2e2e);
+        color: #e0e0e0;
+    }
+
+    .news-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background: #212121;
+        border-bottom: 3px solid #ff6f00;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+
+    .news-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: #ffffff;
+    }
+
+    .source-badge {
+        font-size: 0.85rem;
+        color: #ffffff;
+        background: #ff6f00;
+        padding: 0.4rem 0.8rem;
+        border-radius: 10px;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .news-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .news-card {
+        background: #292929;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(255,111,0,0.5);
+    }
+
+    .news-image {
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .news-card h2 {
+        margin-top: 0;
+        color: #ffb74d;
+        font-size: 1.3rem;
+    }
+
+    .news-card a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .news-card a:hover {
+        text-decoration: underline;
+    }
+
+    .news-card p {
+        color: #cccccc;
+        font-size: 1rem;
+    }
+</style>
+
+{% endblock %}
